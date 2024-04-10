@@ -14,7 +14,7 @@ spring:
     password: 123456
     virtual-host: /
   datasource:
-    url: jdbc:mysql://192.168.28.30:3306/db_bbs
+    url: jdbc:mysql://192.168.28.30:3306/db_server_monitor
     username: root
     password: mysql_HTwEAT
     driver-class-name: com.mysql.cj.jdbc.Driver
