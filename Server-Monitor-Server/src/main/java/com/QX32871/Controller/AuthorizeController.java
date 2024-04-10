@@ -1,9 +1,8 @@
 package com.QX32871.Controller;
 
-import com.QX32871.Entity.VO.Request.ConfirmResetVO;
-import com.QX32871.Entity.VO.Request.EmailRegisterVO;
-import com.QX32871.Entity.VO.Request.EmailResetVO;
 import com.QX32871.Entity.RestBean;
+import com.QX32871.Entity.VO.Request.ConfirmResetVO;
+import com.QX32871.Entity.VO.Request.EmailResetVO;
 import com.QX32871.Service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,17 +44,6 @@ public class AuthorizeController {
                 accountService.registerEmailVerifyCode(type, String.valueOf(email), request.getRemoteAddr()));
     }
 
-    /**
-     * 进行用户注册操作，需要先请求邮件验证码
-     * @param vo 注册信息
-     * @return 是否注册成功
-     */
-    @PostMapping("/register")
-    @Operation(summary = "用户注册操作")
-    public RestBean<Void> register(@RequestBody @Valid EmailRegisterVO vo){
-        return this.messageHandle(() ->
-                accountService.registerEmailAccount(vo));
-    }
 
     /**
      * 执行密码重置确认，检查验证码是否正确
