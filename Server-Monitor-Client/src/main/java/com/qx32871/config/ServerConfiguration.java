@@ -2,6 +2,7 @@ package com.qx32871.config;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.qx32871.entity.ConnectionConfig;
+import com.qx32871.utils.MonitorUtils;
 import com.qx32871.utils.NetUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ public class ServerConfiguration {
     @Resource
     NetUtils netUtils;
 
+    @Resource
+    MonitorUtils monitorUtils;
+
     @Bean
     ConnectionConfig connectionConfig() {
         log.info("正在加载服务端配置......");
@@ -31,6 +35,7 @@ public class ServerConfiguration {
         } else {
             log.info("加载服务端成功!");
         }
+        System.out.println(monitorUtils.monitorBaseDetail());
         return connectionConfig;
     }
 
