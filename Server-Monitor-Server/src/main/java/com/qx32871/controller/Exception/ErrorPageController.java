@@ -1,4 +1,4 @@
-package com.qx32871.cntroller.Exception;
+package com.qx32871.controller.Exception;
 
 import com.qx32871.entity.RestBean;
 import jakarta.servlet.http.HttpServletRequest;

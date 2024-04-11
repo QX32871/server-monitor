@@ -112,7 +112,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
      *
      * @return 生成的token
      */
-    @SuppressWarnings("SpellCheckingInspection")
     private String generateNewToken() {
         String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         SecureRandom random = new SecureRandom();
@@ -120,6 +119,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         for (int i = 0; i < 24; i++) {
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
+        System.out.println(sb);
         return sb.toString();
     }
 }

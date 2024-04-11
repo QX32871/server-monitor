@@ -1,4 +1,4 @@
-package com.qx32871.cntroller;
+package com.qx32871.controller;
 
 import com.qx32871.entity.RestBean;
 import com.qx32871.service.ClientService;
