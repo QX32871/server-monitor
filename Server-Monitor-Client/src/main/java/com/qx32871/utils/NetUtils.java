@@ -1,6 +1,7 @@
 package com.qx32871.utils;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.qx32871.entity.BaseDetail;
 import com.qx32871.entity.ConnectionConfig;
 import com.qx32871.entity.Response;
 import jakarta.annotation.Resource;
@@ -20,7 +21,7 @@ public class NetUtils {
 
     @Lazy   //防止ConnectionConfig这个bean没有注册成功的时候被引用，设置懒加载 防止循环引用
     @Resource
-    ConnectionConfig connectionConfig;
+    ConnectionConfig config;
 
     /**
      * 向服务端注册
@@ -42,7 +43,7 @@ public class NetUtils {
 
     //重载方法
     private Response doGet(String url) {
-        return this.doGet(url, connectionConfig.getAddress(), connectionConfig.getToken());
+        return this.doGet(url, config.getAddress(), config.getToken());
     }
 
     /**
@@ -63,6 +64,31 @@ public class NetUtils {
             return JSONObject.parseObject(response.body()).to(Response.class);
         } catch (Exception e) {
             log.error("在发起服务端请求时出现问题！", e);
+            return Response.errorResponse(e);
+        }
+    }
+
+    public void updateBaseDetails(BaseDetail detail) {
+        Response response = this.doPost("/detail", detail);
+        if(response.success()) {
+            log.info("系统基本信息已更新完成");
+        } else {
+            log.error("系统基本信息更新失败: {}", response.message());
+        }
+    }
+
+    private Response doPost(String url, Object data) {
+        try {
+            String rawData = JSONObject.from(data).toJSONString();
+            HttpRequest request = HttpRequest.newBuilder().POST(HttpRequest.BodyPublishers.ofString(rawData))
+                    .uri(new URI(config.getAddress() + "/api/client" + url))
+                    .header("Authorization", config.getToken())
+                    .header("Content-Type", "application/json")
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return JSONObject.parseObject(response.body()).to(Response.class);
+        } catch (Exception e) {
+            log.error("在发起服务端请求时出现问题", e);
             return Response.errorResponse(e);
         }
     }

@@ -2,14 +2,20 @@ package com.qx32871.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qx32871.entity.dto.ClientDTO;
+import com.qx32871.entity.dto.ClientDetailDTO;
+import com.qx32871.entity.vo.request.ClientDetailVO;
+import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
 import com.qx32871.service.ClientService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +30,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
 
     //作为客户端信息的缓存，根据客户端Token缓存
     private final Map<String, ClientDTO> clientTokenCache = new ConcurrentHashMap<>();
+
+    @Resource
+    ClientDetailMapper detailMapper;
 
     /**
      * 初始化客户端缓存，将所有已注册的客户端都先加载进两个Map中
@@ -86,6 +95,18 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     @Override
     public ClientDTO findClientByToken(String token) {
         return clientTokenCache.get(token);
+    }
+
+    @Override
+    public void updateClientDetail(ClientDetailVO vo, ClientDTO client) {
+        ClientDetailDTO detail = new ClientDetailDTO();
+        BeanUtils.copyProperties(vo, detail);
+        detail.setId(client.getId());
+        if (Objects.nonNull(detailMapper.selectById(client.getId()))) {
+            detailMapper.updateById(detail);
+        } else {
+            detailMapper.insert(detail);
+        }
     }
 
     /**
