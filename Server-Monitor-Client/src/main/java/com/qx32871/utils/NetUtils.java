@@ -68,15 +68,27 @@ public class NetUtils {
         }
     }
 
+    /**
+     * 向服务端更新系统基本信息
+     *
+     * @param detail 客户端基本信息对象
+     */
     public void updateBaseDetails(BaseDetail detail) {
         Response response = this.doPost("/detail", detail);
-        if(response.success()) {
+        if (response.success()) {
             log.info("系统基本信息已更新完成");
         } else {
             log.error("系统基本信息更新失败: {}", response.message());
         }
     }
 
+    /**
+     * 向服务端发起post请求注册Token
+     *
+     * @param url  访问服务端api的url
+     * @param data 服务端地址
+     * @return 注册状态对象
+     */
     private Response doPost(String url, Object data) {
         try {
             String rawData = JSONObject.from(data).toJSONString();

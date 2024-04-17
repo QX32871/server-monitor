@@ -14,16 +14,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ServerMonitorClientApplication implements ApplicationRunner {
 
     @Resource
-    NetUtils netUtils;
+    private NetUtils netUtils;
 
     @Resource
-    MonitorUtils monitorUtils;
+    private MonitorUtils monitorUtils;
 
     public static void main(String[] args) {
         SpringApplication.run(ServerMonitorClientApplication.class, args);
     }
 
-    //客户端运行时向服务端更新基本信息
+    //在客户端运行时向服务端更新基本信息
     @Override
     public void run(ApplicationArguments args) {
         try {

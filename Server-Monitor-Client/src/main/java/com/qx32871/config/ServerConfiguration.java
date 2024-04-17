@@ -26,6 +26,11 @@ public class ServerConfiguration {
     @Resource
     MonitorUtils monitorUtils;
 
+    /**
+     * 加载服务端配置，先寻找本地配置文件，没有的话则启动注册
+     *
+     * @return 服务端配置信息类
+     */
     @Bean
     ConnectionConfig connectionConfig() {
         log.info("正在加载服务端配置......");
@@ -74,6 +79,11 @@ public class ServerConfiguration {
         }
     }
 
+    /**
+     * 把客户端连接服务端的信息保存到一个本地json文件中
+     *
+     * @param config 本次连接服务端的连接对象
+     */
     private void saveConfiguration(ConnectionConfig config) {
         File file = new File("config/server.json");
         try (FileWriter writer = new FileWriter(file)) {

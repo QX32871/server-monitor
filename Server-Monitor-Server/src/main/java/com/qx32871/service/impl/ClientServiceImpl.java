@@ -32,7 +32,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     private final Map<String, ClientDTO> clientTokenCache = new ConcurrentHashMap<>();
 
     @Resource
-    ClientDetailMapper detailMapper;
+    private ClientDetailMapper detailMapper;
 
     /**
      * 初始化客户端缓存，将所有已注册的客户端都先加载进两个Map中
@@ -55,7 +55,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     public boolean verifyAndRegister(String token) {
         if (this.registerToken.equals(token)) {
             int id = this.randomClientID();
-            ClientDTO client = new ClientDTO(id, "未命名主机", token, new Date());
+            ClientDTO client = new ClientDTO(id, "未命名主机", token, "cn", "未命名节点", new Date());
             if (this.save(client)) {
                 registerToken = this.generateNewToken();
                 this.addClientCache(client);
@@ -97,6 +97,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         return clientTokenCache.get(token);
     }
 
+    /**
+     * 向数据库更新客户端基本信息
+     *
+     * @param vo     客户端基本信息对象
+     * @param client 客户端连接信息对象
+     */
     @Override
     public void updateClientDetail(ClientDetailVO vo, ClientDTO client) {
         ClientDetailDTO detail = new ClientDetailDTO();
