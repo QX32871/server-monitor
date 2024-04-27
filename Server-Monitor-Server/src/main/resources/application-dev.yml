@@ -4,6 +4,10 @@ springdoc:
   swagger-ui:
     operations-sorter: alpha
 spring:
+  influx:
+    url: http://192.168.28.30:8086/
+    user: qx32871
+    password: 1228479300
   mail:
     host: smtp.qq.com
     username: 1228479300@qq.com

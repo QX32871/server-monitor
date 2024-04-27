@@ -8,6 +8,7 @@ import com.qx32871.entity.vo.request.RuntimeDetailVO;
 import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
 import com.qx32871.service.ClientService;
+import com.qx32871.utils.InfluxDBUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -32,11 +33,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     //作为客户端信息的缓存，根据客户端Token缓存
     private final Map<String, ClientDTO> clientTokenCache = new ConcurrentHashMap<>();
 
-    //作为客户端主机运行时的缓存，根据客户端ID进行缓存，直接存储主机运行时数据对象
-    private Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
 
     @Resource
     private ClientDetailMapper detailMapper;
+
+    @Resource
+    private InfluxDBUtils dbUtils;
 
     /**
      * 初始化客户端缓存，将所有已注册的客户端都先加载进两个Map中
@@ -119,10 +121,13 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         }
     }
 
+    //作为客户端主机运行时的缓存，根据客户端ID进行缓存，直接存储主机运行时数据对象
+    private final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
+
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client) {
         currentRuntime.put(client.getId(), vo);
-        System.out.println(vo);
+        dbUtils.writeRuntimeData(client.getId(), vo);
     }
 
     /**
