@@ -3,6 +3,7 @@ package com.qx32871.service;
 import com.qx32871.entity.dto.ClientDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qx32871.entity.vo.request.ClientDetailVO;
+import com.qx32871.entity.vo.request.RuntimeDetailVO;
 
 public interface ClientService extends IService<ClientDTO> {
     boolean verifyAndRegister(String token);
@@ -14,4 +15,6 @@ public interface ClientService extends IService<ClientDTO> {
     ClientDTO findClientByToken(String token);
 
     void updateClientDetail(ClientDetailVO vo, ClientDTO client);
+
+    void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client);
 }

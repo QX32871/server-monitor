@@ -3,6 +3,7 @@ package com.qx32871.controller;
 import com.qx32871.entity.RestBean;
 import com.qx32871.entity.dto.ClientDTO;
 import com.qx32871.entity.vo.request.ClientDetailVO;
+import com.qx32871.entity.vo.request.RuntimeDetailVO;
 import com.qx32871.service.ClientService;
 import com.qx32871.utils.Const;
 import jakarta.annotation.Resource;
@@ -37,6 +38,13 @@ public class ClientController {
     public RestBean<Void> updateClientDetails(@RequestAttribute(Const.ATTR_CLIENT) ClientDTO client,
                                               @RequestBody @Valid ClientDetailVO vo) {
         clientService.updateClientDetail(vo, client);
+        return RestBean.success();
+    }
+
+    @PostMapping("/runtime")
+    public RestBean<Void> updateRuntimeDetails(@RequestAttribute(Const.ATTR_CLIENT) ClientDTO client,
+                                               @RequestBody @Valid RuntimeDetailVO vo) {
+        clientService.updateRuntimeDetail(vo, client);
         return RestBean.success();
     }
 }

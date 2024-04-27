@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.qx32871.entity.BaseDetail;
 import com.qx32871.entity.ConnectionConfig;
 import com.qx32871.entity.Response;
+import com.qx32871.entity.RuntimeDetail;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -79,6 +80,18 @@ public class NetUtils {
             log.info("系统基本信息已更新完成");
         } else {
             log.error("系统基本信息更新失败: {}", response.message());
+        }
+    }
+
+    /**
+     * 向服务端更新系统运行时信息
+     *
+     * @param detail 客户端运行时信息对象
+     */
+    public void updateRuntimeDetails(RuntimeDetail detail) {
+        Response response = this.doPost("/runtime", detail);
+        if (!response.success()) {
+            log.warn("更新运行状态时，接收到服务端的异常响应内容: {}", response.message());
         }
     }
 

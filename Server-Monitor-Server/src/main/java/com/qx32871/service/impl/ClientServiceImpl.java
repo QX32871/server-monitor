@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qx32871.entity.dto.ClientDTO;
 import com.qx32871.entity.dto.ClientDetailDTO;
 import com.qx32871.entity.vo.request.ClientDetailVO;
+import com.qx32871.entity.vo.request.RuntimeDetailVO;
 import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
 import com.qx32871.service.ClientService;
@@ -30,6 +31,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
 
     //作为客户端信息的缓存，根据客户端Token缓存
     private final Map<String, ClientDTO> clientTokenCache = new ConcurrentHashMap<>();
+
+    //作为客户端主机运行时的缓存，根据客户端ID进行缓存，直接存储主机运行时数据对象
+    private Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
 
     @Resource
     private ClientDetailMapper detailMapper;
@@ -113,6 +117,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         } else {
             detailMapper.insert(detail);
         }
+    }
+
+    @Override
+    public void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client) {
+        currentRuntime.put(client.getId(), vo);
+        System.out.println(vo);
     }
 
     /**
