@@ -1,0 +1,62 @@
+<script setup>
+import PreviewCard from "@/component/PreviewCard.vue";
+</script>
+
+<template>
+  <div class="manage-main">
+    <div class="title">
+      <i class="fa-solid fa-server"></i> 管理主机列表
+    </div>
+    <div class="desc">
+      在这里管理所有已注册的主机实例，监控主机运行状态，快速进行管理操作
+    </div>
+    <el-divider style="margin: 10px 0"/>
+    <div class="card-list">
+      <preview-card/>
+      <preview-card/>
+      <preview-card/>
+      <preview-card/>
+      <preview-card/>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+:deep(.el-drawer__header) {
+  margin-bottom: 10px;
+}
+
+:deep(.el-checkbox-group .el-checkbox) {
+  margin-right: 10px;
+}
+
+:deep(.el-drawer) {
+  margin: 10px;
+  height: calc(100% - 20px);
+  border-radius: 10px;
+}
+
+:deep(.el-drawer__body) {
+  padding: 0;
+}
+
+.manage-main {
+  margin: 0 50px;
+
+  .title {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .desc {
+    font-size: 15px;
+    color: grey;
+  }
+}
+
+.card-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+</style>

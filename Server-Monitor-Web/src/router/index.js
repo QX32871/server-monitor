@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { unauthorized } from "@/net";
+import {createRouter, createWebHistory} from 'vue-router'
+import {unauthorized} from "@/net";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,15 +23,26 @@ const router = createRouter({
             path: '/index',
             name: 'index',
             component: () => import('@/views/IndexView.vue'),
+            children: [
+                {
+                    path: '',
+                    name: 'manage',
+                    component: () => import('@/views/main/Manage.vue')
+                }, {
+                    path: 'security',
+                    name: 'security',
+                    component: () => import('@/views/main/Security.vue')
+                }
+            ]
         }
     ]
 })
 
 router.beforeEach((to, from, next) => {
     const isUnauthorized = unauthorized()
-    if(to.name.startsWith('welcome') && !isUnauthorized) {
+    if (to.name.startsWith('welcome') && !isUnauthorized) {
         next('/index')
-    } else if(to.fullPath.startsWith('/index') && isUnauthorized) {
+    } else if (to.fullPath.startsWith('/index') && isUnauthorized) {
         next('/')
     } else {
         next()

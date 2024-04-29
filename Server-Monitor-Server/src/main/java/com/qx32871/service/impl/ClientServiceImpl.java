@@ -38,7 +38,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     private ClientDetailMapper detailMapper;
 
     @Resource
-    private InfluxDBUtils dbUtils;
+    private InfluxDBUtils influxDBUtils;
 
     /**
      * 初始化客户端缓存，将所有已注册的客户端都先加载进两个Map中
@@ -127,7 +127,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client) {
         currentRuntime.put(client.getId(), vo);
-        dbUtils.writeRuntimeData(client.getId(), vo);
+        influxDBUtils.writeRuntimeData(client.getId(), vo);
     }
 
     /**
