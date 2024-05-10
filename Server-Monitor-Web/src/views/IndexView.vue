@@ -51,7 +51,7 @@ function userLogout() {
                    :inactive-action-icon="Sunny"/>
         <el-dropdown>
           <el-avatar class="avatar"
-                     src="https://missuo.ru/file/332d60233067a91c309f3.jpg"/>
+                     src="https://p.sda1.dev/17/9c909ed8057eb3ed63e2561997da29d4/1F68B2F202DD65CE7C3283A262542026.jpg"/>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="userLogout">

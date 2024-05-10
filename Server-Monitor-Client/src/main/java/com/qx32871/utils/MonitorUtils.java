@@ -77,7 +77,7 @@ public class MonitorUtils {
             write = (hardware.getDiskStores().stream().mapToLong(HWDiskStore::getWriteBytes).sum() - write) / statisticTime;
             double memory = (hardware.getMemory().getTotal() - hardware.getMemory().getAvailable()) / 1024.0 / 1024 / 1024; //以GB为单位
             double disk = Arrays.stream(File.listRoots())
-                    .mapToLong(file -> file.getTotalSpace() - file.getFreeSpace()).sum() / 1024.0 / 1024.1024;
+                    .mapToLong(file -> file.getTotalSpace() - file.getFreeSpace()).sum() / 1024.0 / 1024 / 1024;
             return new RuntimeDetail()
                     .setCpuUsage(this.calculateCpuUsage(processor, ticks))
                     .setMemoryUsage(memory)

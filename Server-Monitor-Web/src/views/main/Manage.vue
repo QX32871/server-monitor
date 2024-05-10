@@ -1,5 +1,25 @@
 <script setup>
 import PreviewCard from "@/component/PreviewCard.vue";
+import {reactive, ref} from "vue";
+import {get} from "@/net";
+import ClientDetails from "@/component/ClientDetails.vue";
+
+const list = ref([]);
+
+const updateList = () => get('/api/monitor/list', data => list.value = data)
+//定时器，每隔5秒刷新一次list
+setInterval(updateList, 5000);
+updateList();
+
+const detail = reactive(({
+  show: false,
+  id: -1
+}))
+
+const displayClientDetails = (id) => {
+  detail.show = true;
+  detail.id = id;
+}
 </script>
 
 <template>
@@ -12,12 +32,12 @@ import PreviewCard from "@/component/PreviewCard.vue";
     </div>
     <el-divider style="margin: 10px 0"/>
     <div class="card-list">
-      <preview-card/>
-      <preview-card/>
-      <preview-card/>
-      <preview-card/>
-      <preview-card/>
+      <preview-card v-for="item in list" :data="item" :update="updateList" @click="displayClientDetails(item.id)"/>
     </div>
+    <el-drawer size="520" :show-close="false" v-model="detail.show"
+               :with-header="false" v-if="list.length" @close="detail.id = -1">
+      <client-details :id="detail.id"/>
+    </el-drawer>
   </div>
 </template>
 

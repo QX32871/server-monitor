@@ -1,5 +1,10 @@
 <script setup>
+import {copyIp, fitByUnit, osNameToIcon, percentageToStatus, rename} from '@/tools'
 
+const props = defineProps({
+  data: Object,
+  update: Function
+})
 </script>
 
 <template>
@@ -7,67 +12,82 @@
     <div style="display: flex;justify-content: space-between">
       <div>
         <div class="name">
-          <span class="flag-icon flag-icon-cn"></span>
-          <span style="margin: 0 10px">服务器1</span>
-          <i class="fa-solid fa-pen-to-square"></i>
+          <span :class="`flag-icon flag-icon-${data.location}`"></span>
+          <span style="margin: 0 5px">{{ data.name }}</span>
+          <i class="fa-solid fa-pen-to-square interact-item" @click.stop="rename(data.id, data.name, update)"></i>
         </div>
         <div class="os">
-          操作系统：Windows Server 2012
+          操作系统:
+          <i :style="{color: osNameToIcon(data.osName).color}"
+             :class="`fa-brands ${osNameToIcon(data.osName).icon}`"></i>
+          {{ `${data.osName} ${data.osVersion}` }}
         </div>
-
       </div>
 
-      <div class="status">
-        <i style="color: #1fa81f" class="fa-solid fa-circle-play"></i>
+      <div class="status" v-if="data.online">
+        <i style="color: #18cb18" class="fa-solid fa-circle-play"></i>
         <span style="margin-left: 5px">运行中</span>
+      </div>
+      <div class="status" v-else>
+        <i style="color: #8a8a8a" class="fa-solid fa-circle-stop"></i>
+        <span style="margin-left: 5px">离线</span>
       </div>
     </div>
     <el-divider style="margin: 10px 0"/>
     <!--网络信息-->
     <div class="network">
-      <span style="margin-right: 10px">公网IP：192.168.23.203</span>
-      <i style="color: dodgerblue" class="fa-solid fa-copy"></i>
+      <span style="margin-right: 10px">公网IP: {{ data.ip }}</span>
+      <i class="fa-solid fa-copy interact-item" @click.stop="copyIp(data.ip)" style="color: dodgerblue"></i>
     </div>
     <!--    硬件信息-->
+    <div class="cpu">
+      <span style="margin-right: 10px">处理器: {{ data.cpuName }}</span>
+    </div>
     <div class="hardware">
-      <i style="margin-right: 5px" class="fa-solid fa-microchip"></i>
-      <span style="margin-right: 15px">2 CPU</span>
-      <i style="margin-right: 5px" class="fa-solid fa-memory"></i>
-      <span>4 GB</span>
+      <i class="fa-solid fa-microchip"></i>
+      <span style="margin-right: 10px">{{ ` ${data.cpuCore} CPU Core` }}</span>
+      <i class="fa-solid fa-memory"></i>
+      <span>{{ ` ${data.memory.toFixed(1)} GB` }}</span>
     </div>
 
     <div class="progress">
-      <span>CPU: 2.5%</span>
-      <el-progress status="success" :percentage="2.5" :stroke-width="5" :show-text="false"/>
+      <span>{{ `CPU使用量: ${(data.cpuUsage * 100).toFixed(1)}%` }}</span>
+      <el-progress :status="percentageToStatus(data.cpuUsage * 100)"
+                   :percentage="data.cpuUsage * 100"
+                   :stroke-width="5"
+                   :show-text="false"/>
     </div>
     <div class="progress">
-      <span>内存: 1.2 GB</span>
-      <el-progress status="success" :percentage="1.2 / 4 *100" :stroke-width="5" :show-text="false"/>
+      <span>内存使用量: <b>{{ data.memoryUsage.toFixed(1) }}</b> GB</span>
+      <el-progress :status="percentageToStatus(data.memoryUsage/data.memory * 100)"
+                   :percentage="data.memoryUsage/data.memory * 100" :stroke-width="5" :show-text="false"/>
     </div>
     <div class="network-flow">
       <div>网络流量</div>
       <div>
         <i class="fa-solid fa-arrow-up"></i>
-        <span>52 KB/s</span>
+        <span>{{ ` ${fitByUnit(data.networkUpload, 'KB')}/s` }}</span>
         <el-divider direction="vertical"/>
         <i class="fa-solid fa-arrow-down"></i>
-        <span>256 KB/s</span>
+        <span>{{ ` ${fitByUnit(data.networkDownload, 'KB')}/s` }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-:deep(.el-progress-bar__outer) {
-  background-color: #18cb1822;
-}
-
-:deep(.el-progress-bar__inner) {
-  color: #18cb18;
-}
-
 .dark .instance-card {
   color: #d9d9d9;
+}
+
+.interact-item {
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    scale: 1.1;
+    opacity: 0.8;
+  }
 }
 
 .instance-card {
@@ -77,6 +97,11 @@
   border-radius: 5px;
   box-sizing: border-box;
   color: #383434;
+
+  &:hover {
+    cursor: pointer;
+    scale: 1.02;
+  }
 
   .name {
     font-size: 15px;
@@ -95,6 +120,10 @@
   .network {
     font-size: 13px;
 
+  }
+
+  .cpu {
+    font-size: 13px;
   }
 
   .hardware {

@@ -1,10 +1,16 @@
 package com.qx32871.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qx32871.entity.dto.ClientDTO;
 import com.qx32871.entity.dto.ClientDetailDTO;
 import com.qx32871.entity.vo.request.ClientDetailVO;
+import com.qx32871.entity.vo.request.RenameClientVO;
+import com.qx32871.entity.vo.request.RenameNodeVO;
 import com.qx32871.entity.vo.request.RuntimeDetailVO;
+import com.qx32871.entity.vo.response.ClientDetailsVO;
+import com.qx32871.entity.vo.response.ClientPreviewVO;
+import com.qx32871.entity.vo.response.RuntimeHistoryVO;
 import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
 import com.qx32871.service.ClientService;
@@ -15,10 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -35,7 +38,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
 
 
     @Resource
-    private ClientDetailMapper detailMapper;
+    private ClientDetailMapper clientDetailMapper;
 
     @Resource
     private InfluxDBUtils influxDBUtils;
@@ -114,10 +117,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         ClientDetailDTO detail = new ClientDetailDTO();
         BeanUtils.copyProperties(vo, detail);
         detail.setId(client.getId());
-        if (Objects.nonNull(detailMapper.selectById(client.getId()))) {
-            detailMapper.updateById(detail);
+        if (Objects.nonNull(clientDetailMapper.selectById(client.getId()))) {
+            clientDetailMapper.updateById(detail);
         } else {
-            detailMapper.insert(detail);
+            clientDetailMapper.insert(detail);
         }
     }
 
@@ -128,6 +131,90 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     public void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client) {
         currentRuntime.put(client.getId(), vo);
         influxDBUtils.writeRuntimeData(client.getId(), vo);
+    }
+
+    /**
+     * 获取实例服务器卡片上的信息
+     *
+     * @return 实例服务器信息对象集合
+     */
+    @Override
+    public List<ClientPreviewVO> listClients() {
+        return clientIdCache.values().stream().map(clientDTO -> {
+            ClientPreviewVO vo = clientDTO.asViewObject(ClientPreviewVO.class);
+            BeanUtils.copyProperties(clientDetailMapper.selectById(vo.getId()), vo);
+            RuntimeDetailVO runtime = currentRuntime.get(clientDTO.getId());
+            if (this.isOnline(runtime)) {
+                //如果runtime为空或者runtime中的数据存在超过一分钟，那就认为客户端离线
+                BeanUtils.copyProperties(runtime, vo);
+                vo.setOnline(true);
+            }
+            return vo;
+        }).toList();
+    }
+
+    /**
+     * 重命名实例服务器名字
+     *
+     * @param vo 包含重命名信息实体类
+     */
+    @Override
+    public void renameClient(RenameClientVO vo) {
+        this.update(Wrappers.<ClientDTO>update().eq("id", vo.getId())
+                .set("name", vo.getName()));
+        this.initClientCache(); //更新客户端名后更新缓存
+    }
+
+    /**
+     * 重命名实例服务器节点
+     *
+     * @param vo 包含重命名信息实体类
+     */
+    @Override
+    public void renameNode(RenameNodeVO vo) {
+        this.update(Wrappers.<ClientDTO>update().eq("id", vo.getId())
+                .set("node", vo.getNode())
+                .set("location", vo.getLocation()));
+        this.initClientCache(); //更新客户端名后更新缓存
+    }
+
+    /**
+     * 根据ID找出指定实例主机的基本信息
+     *
+     * @param clientId 指定实例主机的ID
+     * @return 指定实例主机的基本信息
+     */
+    @Override
+    public ClientDetailsVO clientDetails(int clientId) {
+        ClientDetailsVO vo = this.clientIdCache.get(clientId).asViewObject(ClientDetailsVO.class);
+        BeanUtils.copyProperties(clientDetailMapper.selectById(clientId), vo);
+        vo.setOnline(this.isOnline(currentRuntime.get(clientId)));
+        return vo;
+    }
+
+    /**
+     * 获取实时运行数据
+     *
+     * @param clientId 目标实例主机客户端ID
+     * @return 实时运行数据实体类
+     */
+    @Override
+    public RuntimeDetailVO clientRuntimeDetailsNow(int clientId) {
+        return currentRuntime.get(clientId);
+    }
+
+    /**
+     * 获取历史运行时数据   (供前端图表使用)
+     *
+     * @param clientId 目标实例主机客户端ID
+     * @return 历史运行时数据实体类
+     */
+    @Override
+    public RuntimeHistoryVO clientRuntimeHistoryDetails(int clientId) {
+        RuntimeHistoryVO vo = influxDBUtils.readRuntimeData(clientId);
+        ClientDetailDTO detail = clientDetailMapper.selectById(clientId);
+        BeanUtils.copyProperties(detail, vo);
+        return vo;
     }
 
     /**
@@ -163,5 +250,15 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         }
         System.out.println(sb);
         return sb.toString();
+    }
+
+    /**
+     * 判断实例服务器是否在线
+     *
+     * @param runtime 对应实例服务器的运行时信息
+     * @return 是否在线
+     */
+    private Boolean isOnline(RuntimeDetailVO runtime) {
+        return runtime != null && System.currentTimeMillis() - runtime.getTimesTamp() < 60 * 1000;
     }
 }
