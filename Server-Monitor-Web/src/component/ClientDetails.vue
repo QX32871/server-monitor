@@ -53,7 +53,7 @@ const submitNodeEdit = () => {
 }
 
 function updateDetails() {
-  // props.update();
+  props.update();
   init(props.id);
 }
 
@@ -90,8 +90,6 @@ watch(() => props.id, init, {immediate: true});
           <i class="fa-solid fa-server"></i>
           服务器信息
         </div>
-
-<!--        <span style="font-size: 13px;color: grey">更改服务器名称或节点名称后可能要刷新后才能生效</span>-->
 
         <el-divider style="margin: 10px 0"/>
         <div class="details-list">

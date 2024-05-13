@@ -248,7 +248,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         for (int i = 0; i < 24; i++) {
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
-        System.out.println(sb);
         return sb.toString();
     }
 
