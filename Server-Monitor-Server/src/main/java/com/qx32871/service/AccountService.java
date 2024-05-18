@@ -14,4 +14,6 @@ public interface AccountService extends IService<AccountDTO>, UserDetailsService
     String resetEmailAccountPassword(EmailResetVO info);
 
     String resetConfirm(ConfirmResetVO info);
+
+    boolean resetPassword(int id, String passwordBefore, String passwordNew);
 }

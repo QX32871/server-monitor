@@ -36,4 +36,6 @@ public interface ClientService extends IService<ClientDTO> {
     RuntimeDetailVO clientRuntimeDetailsNow(int clientId);
 
     RuntimeHistoryVO clientRuntimeHistoryDetails(int clientId);
+
+    void deleteClient(int clientId);
 }

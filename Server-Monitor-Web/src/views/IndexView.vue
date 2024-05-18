@@ -68,7 +68,9 @@ function userLogout() {
     <el-main class="main-content">
       <router-view v-slot="{Component}">
         <transition name="el-fade-in-linear" mode="out-in">
-          <component :is="Component"/>
+          <keep-alive exclude="Security">
+            <component :is="Component"/>
+          </keep-alive>
         </transition>
       </router-view>
     </el-main>

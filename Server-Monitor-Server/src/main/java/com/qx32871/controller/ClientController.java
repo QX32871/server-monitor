@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
 
     @Resource
-    ClientService clientService;
+    private ClientService clientService;
 
     /**
      * token注册接口

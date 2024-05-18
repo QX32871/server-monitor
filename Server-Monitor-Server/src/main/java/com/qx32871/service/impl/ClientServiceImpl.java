@@ -218,6 +218,19 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
     }
 
     /**
+     * 根据客户端ID删除客户端
+     *
+     * @param clientId 客户端ID
+     */
+    @Override
+    public void deleteClient(int clientId) {
+        this.removeById(clientId);
+        clientDetailMapper.deleteById(clientId);
+        this.initClientCache();
+        currentRuntime.remove(clientId);
+    }
+
+    /**
      * 根据客户端的ID和Token分别做缓存,存在两个ConcurrentHashMap中
      *
      * @param client 查询出来的客户端对象

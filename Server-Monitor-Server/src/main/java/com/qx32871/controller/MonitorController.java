@@ -57,4 +57,10 @@ public class MonitorController {
     public RestBean<String> registerToken() {
         return RestBean.success(clientService.registerToken());
     }
+
+    @GetMapping("/delete")
+    public RestBean<String> deleteClient(int clientId) {
+        clientService.deleteClient(clientId);
+        return RestBean.success();
+    }
 }

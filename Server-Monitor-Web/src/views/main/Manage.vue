@@ -1,14 +1,33 @@
 <script setup>
 import PreviewCard from "@/component/PreviewCard.vue";
-import {reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {get} from "@/net";
 import ClientDetails from "@/component/ClientDetails.vue";
 import RegisterCard from "@/component/RegisterCard.vue";
 import {Plus} from "@element-plus/icons-vue";
+import {useRoute} from "vue-router";
 
 const list = ref([]);
 
-const updateList = () => get('/api/monitor/list', data => list.value = data)
+const route = useRoute();
+
+const locations = [
+  {name: 'cn', desc: '中国大陆'},
+  {name: 'hk', desc: '香港'},
+  {name: 'jp', desc: '日本'},
+  {name: 'us', desc: '美国'},
+  {name: 'sg', desc: '新加坡'},
+  {name: 'kr', desc: '韩国'},
+  {name: 'de', desc: '德国'}
+]
+
+const checkedNode = ref([]);
+
+const updateList = () => {
+  if (route.name === 'manage'){
+    get('/api/monitor/list', data => list.value = data);
+  }
+}
 //定时器，每隔5秒刷新一次list
 setInterval(updateList, 5000);
 updateList();
@@ -17,6 +36,14 @@ const detail = reactive(({
   show: false,
   id: -1
 }))
+
+const clientList = computed(() => {
+  if (checkedNode.value.length === 0) {
+    return list.value;
+  } else {
+    return list.value.filter(item => checkedNode.value.indexOf(item.location) >= 0);
+  }
+})
 
 const displayClientDetails = (id) => {
   detail.show = true;
@@ -52,12 +79,22 @@ const refreshToken = () => {
     </div>
 
     <el-divider style="margin: 10px 0"/>
-    <div class="card-list">
-      <preview-card v-for="item in list" :data="item" :update="updateList" @click="displayClientDetails(item.id)"/>
+    <div style="margin-bottom: 20px">
+      <el-checkbox-group v-model="checkedNode">
+        <el-checkbox v-for="node in locations" :key="node" :label="node.name" border>
+          <span :class="`flag-icon flag-icon-${node.name}`"></span>
+          <span style="font-size: 13px;margin-left: 10px">{{ node.desc }}</span>
+        </el-checkbox>
+      </el-checkbox-group>
     </div>
+    <div class="card-list" v-if="list.length">
+      <preview-card v-for="item in clientList" :data="item" :update="updateList"
+                    @click="displayClientDetails(item.id)"/>
+    </div>
+    <el-empty description="无任何已注册主机，点击“添加新主机”来进行操作" v-else/>
     <el-drawer size="520" :show-close="false" v-model="detail.show"
                :with-header="false" v-if="list.length" @close="detail.id = -1">
-      <client-details :id="detail.id" :update="updateList"/>
+      <client-details :id="detail.id" :update="updateList" @delete="updateList"/>
     </el-drawer>
     <el-drawer v-model="register.show" @open="refreshToken">
       <register-card :token="register.token"/>
