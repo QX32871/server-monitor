@@ -8,6 +8,7 @@ import com.qx32871.entity.vo.request.RenameNodeVO;
 import com.qx32871.entity.vo.request.RuntimeDetailVO;
 import com.qx32871.entity.vo.response.ClientDetailsVO;
 import com.qx32871.entity.vo.response.ClientPreviewVO;
+import com.qx32871.entity.vo.response.ClientSimpleVO;
 import com.qx32871.entity.vo.response.RuntimeHistoryVO;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public interface ClientService extends IService<ClientDTO> {
     void updateRuntimeDetail(RuntimeDetailVO vo, ClientDTO client);
 
     List<ClientPreviewVO> listClients();
+
+    List<ClientSimpleVO> listSimpleList();
 
     void renameClient(RenameClientVO vo);
 

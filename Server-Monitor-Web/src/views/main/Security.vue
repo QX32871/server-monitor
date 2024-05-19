@@ -3,7 +3,8 @@ import {reactive, ref} from "vue";
 import router from "@/router";
 import {logout, post} from "@/net";
 import {ElMessage} from "element-plus";
-import {Switch} from "@element-plus/icons-vue";
+import {Plus, Switch} from "@element-plus/icons-vue";
+import CreateSubAccount from "@/component/CreateSubAccount.vue";
 
 const formRef = ref()
 const valid = ref(false)
@@ -54,6 +55,9 @@ function resetPassword() {
   })
 }
 
+const simpleList = ref([]);
+
+const createAccount = ref(false);
 
 </script>
 
@@ -85,11 +89,18 @@ function resetPassword() {
           </div>
         </el-form>
       </div>
-      <!--右边-->
-      <div class="info-card">
-
-      </div>
     </div>
+    <!--右边-->
+    <div class="info-card" style="flex: 50%">
+      <div class="title"><i class="fa-solid fa-users"></i> 子用户管理</div>
+      <el-divider style="margin: 10px 0"/>
+      <el-empty :image-size="100" description="无任何子账户">
+        <el-button :icon="Plus" type="primary" plain @click="createAccount = true">添加子账户</el-button>
+      </el-empty>
+    </div>
+    <el-drawer v-model="createAccount" size="520" :with-header="false">
+      <CreateSubAccount/>
+    </el-drawer>
   </div>
 </template>
 

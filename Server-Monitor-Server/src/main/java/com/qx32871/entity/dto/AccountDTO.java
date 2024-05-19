@@ -17,10 +17,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class AccountDTO implements BaseData {
     @TableId(type = IdType.AUTO)
-    Integer id;
-    String username;
-    String password;
-    String email;
-    String role;
-    Date registerTime;
+    private Integer id;
+    private String username;
+    private String password;
+    private String email;
+    private String role;
+    private Date registerTime;
+    private String clients;
 }

@@ -10,6 +10,7 @@ import com.qx32871.entity.vo.request.RenameNodeVO;
 import com.qx32871.entity.vo.request.RuntimeDetailVO;
 import com.qx32871.entity.vo.response.ClientDetailsVO;
 import com.qx32871.entity.vo.response.ClientPreviewVO;
+import com.qx32871.entity.vo.response.ClientSimpleVO;
 import com.qx32871.entity.vo.response.RuntimeHistoryVO;
 import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
@@ -149,6 +150,20 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
                 BeanUtils.copyProperties(runtime, vo);
                 vo.setOnline(true);
             }
+            return vo;
+        }).toList();
+    }
+
+    /**
+     * 获取简略客户端信息以供分配子用户主机页面使用
+     *
+     * @return 简略的客户端信息实体类
+     */
+    @Override
+    public List<ClientSimpleVO> listSimpleList() {
+        return clientIdCache.values().stream().map(clientDTO -> {
+            ClientSimpleVO vo = clientDTO.asViewObject(ClientSimpleVO.class);
+            BeanUtils.copyProperties(clientDetailMapper.selectById(vo.getId()), vo);
             return vo;
         }).toList();
     }

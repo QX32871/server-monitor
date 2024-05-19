@@ -1,9 +1,12 @@
 package com.qx32871.service.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.qx32871.entity.dto.AccountDTO;
 import com.qx32871.entity.vo.request.ConfirmResetVO;
+import com.qx32871.entity.vo.request.CreateSubAccountVO;
 import com.qx32871.entity.vo.request.EmailResetVO;
+import com.qx32871.entity.vo.response.SubAccountVO;
 import com.qx32871.mapper.AccountMapper;
 import com.qx32871.service.AccountService;
 import com.qx32871.utils.Const;
@@ -19,6 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -144,6 +149,51 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDTO> i
         this.update(Wrappers.<AccountDTO>update().eq("id", id)
                 .set("password", passwordEncoder.encode(passwordNew)));
         return true;
+    }
+
+    /**
+     * 创建子账户
+     *
+     * @param vo 子账户创建信息
+     */
+    @Override
+    public void createSubAccount(CreateSubAccountVO vo) {
+        AccountDTO account = this.findAccountByNameOrEmail(vo.getEmail());
+        if (account != null) {
+            throw new IllegalArgumentException("该电子邮件已被注册!");
+        }
+        account = this.findAccountByNameOrEmail(vo.getUsername());
+        if (account != null) {
+            throw new IllegalArgumentException("该用户名已被注册!");
+        }
+        account = new AccountDTO(null, vo.getUsername(), passwordEncoder.encode(vo.getPassword())
+                , vo.getEmail(), Const.ROLE_NORMAL, new Date(), JSONArray.copyOf(vo.getClients()).toJSONString());
+        this.save(account);
+    }
+
+    /**
+     * 删除子账户
+     *
+     * @param uid 子账户ID
+     */
+    @Override
+    public void deleteSubAccount(int uid) {
+        this.removeById(uid);
+    }
+
+    /**
+     * 获取子账户列表
+     *
+     * @return 子账户列表
+     */
+    @Override
+    public List<SubAccountVO> listSubAccount() {
+        return this.list(Wrappers.<AccountDTO>query().eq("role", Const.ROLE_NORMAL))
+                .stream().map(accountDTO -> {
+                    SubAccountVO vo = accountDTO.asViewObject(SubAccountVO.class);  //把DTO转成VO
+                    vo.setClientList(JSONArray.parse(accountDTO.getClients()));
+                    return vo;  //再把转换完成的vo返回到流中去
+                }).toList(); //最后把流再转回List并返回
     }
 
     /**
