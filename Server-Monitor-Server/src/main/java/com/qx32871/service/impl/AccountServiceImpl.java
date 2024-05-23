@@ -6,6 +6,7 @@ import com.qx32871.entity.dto.AccountDTO;
 import com.qx32871.entity.vo.request.ConfirmResetVO;
 import com.qx32871.entity.vo.request.CreateSubAccountVO;
 import com.qx32871.entity.vo.request.EmailResetVO;
+import com.qx32871.entity.vo.request.ModifyEmailVO;
 import com.qx32871.entity.vo.response.SubAccountVO;
 import com.qx32871.mapper.AccountMapper;
 import com.qx32871.service.AccountService;
@@ -194,6 +195,34 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDTO> i
                     vo.setClientList(JSONArray.parse(accountDTO.getClients()));
                     return vo;  //再把转换完成的vo返回到流中去
                 }).toList(); //最后把流再转回List并返回
+    }
+
+    /**
+     * 修改用户邮箱地址
+     *
+     * @param id 用户ID
+     * @param vo 修改用户邮箱地址信息
+     * @return 提示信息
+     */
+    @Override
+    public String modifyEmail(int id, ModifyEmailVO vo) {
+        String code = getEmailVerifyCode(vo.getEmail());
+        if (code == null) {
+            return "请先获取验证码";
+        }
+        if (!code.equals(vo.getCode())) {
+            return "验证码错误";
+        }
+        this.deleteEmailVerifyCode(vo.getEmail());
+        AccountDTO account = this.findAccountByNameOrEmail(vo.getEmail());
+        if (account == null || account.getId() != id) {
+            return "改邮箱已被绑定";
+        }
+        this.update()
+                .set("email", vo.getEmail())
+                .eq("id", id)
+                .update();
+        return null;
     }
 
     /**
