@@ -1,14 +1,17 @@
 <script setup>
 import {reactive, ref} from "vue";
 import router from "@/router";
-import {logout, post} from "@/net";
+import {get, logout, post} from "@/net";
 import {ElMessage} from "element-plus";
-import {Plus, Switch} from "@element-plus/icons-vue";
+import {Delete, Plus, Switch} from "@element-plus/icons-vue";
 import CreateSubAccount from "@/component/CreateSubAccount.vue";
+import {useStore} from "@/store";
 
 const formRef = ref()
 const valid = ref(false)
 const onValidate = (prop, isValid) => valid.value = isValid
+
+const store = useStore();
 
 const form = reactive({
   password: '',
@@ -56,9 +59,26 @@ function resetPassword() {
 }
 
 const simpleList = ref([]);
+if (store.isAdmin) {
+  get('/api/monitor/simple-list', list => {
+    simpleList.value = list;
+    initSubAccounts();
+  })
+}
+
+
+const accounts = ref([])
+const initSubAccounts = () =>
+    get('/api/user/sub/list', list => accounts.value = list)
 
 const createAccount = ref(false);
 
+function deleteAccount(id) {
+  get(`/api/user/sub/delete?uid=${id}`, () => {
+    ElMessage.success('子账户删除成功')
+    initSubAccounts()
+  })
+}
 </script>
 
 <template>
@@ -94,12 +114,38 @@ const createAccount = ref(false);
     <div class="info-card" style="flex: 50%">
       <div class="title"><i class="fa-solid fa-users"></i> 子用户管理</div>
       <el-divider style="margin: 10px 0"/>
-      <el-empty :image-size="100" description="无任何子账户">
-        <el-button :icon="Plus" type="primary" plain @click="createAccount = true">添加子账户</el-button>
-      </el-empty>
+      <div v-if="accounts.length" style="text-align: center">
+        <div v-for="item in accounts" class="account-card">
+          <el-avatar class="avatar" :size="30"
+                     src="https://p.sda1.dev/17/0cde298dc8a7239b844d4dc146fe8816/2.jpg"/>
+          <div style="margin-left: 15px;line-height: 18px;flex: 1">
+            <div>
+              <span>{{ item.username }}</span>
+              <span style="font-size: 13px;color: grey;margin-left: 5px">
+                管理 {{ item.clientList.length }} 个服务器
+              </span>
+            </div>
+            <div style="font-size: 13px;color: grey">{{ item.email }}</div>
+          </div>
+          <el-button type="danger" :icon="Delete"
+                     @click="deleteAccount(item.id)" text>删除子账户
+          </el-button>
+        </div>
+        <el-button :icon="Plus" type="primary"
+                   @click="createAccount = true" plain>添加更多子账户
+        </el-button>
+      </div>
+      <div v-else>
+        <el-empty :image-size="100" description="无任何子账户" v-if="store.isAdmin">
+          <el-button :icon="Plus" type="primary" plain @click="createAccount = true">添加子账户</el-button>
+        </el-empty>
+        <el-empty :image-size="100" description="仅限管理员操作" v-else/>
+      </div>
+
+
     </div>
     <el-drawer v-model="createAccount" size="520" :with-header="false">
-      <CreateSubAccount/>
+      <CreateSubAccount :clients="simpleList" @create="createAccount = false;initSubAccounts()"/>
     </el-drawer>
   </div>
 </template>

@@ -6,6 +6,10 @@ import {ref} from "vue";
 import {useDark} from "@vueuse/core";
 import TabItem from "@/component/TabItem.vue";
 import {useRoute} from "vue-router";
+import {useStore} from "@/store";
+
+const store = useStore()
+
 
 const dark = ref(useDark());
 const route = useRoute();
@@ -49,6 +53,14 @@ function userLogout() {
                    v-model="dark" active-color="#424242"
                    :active-action-icon="Moon"
                    :inactive-action-icon="Sunny"/>
+        <div style="text-align: right;line-height: 16px;margin-right: 10px">
+          <div>
+            <el-tag type="success" v-if="store.isAdmin" size="small">管理员</el-tag>
+            <el-tag v-else size="small">子账户</el-tag>
+            {{ store.user.username }}
+          </div>
+          <div style="font-size: 13px;color: grey">{{ store.user.email }}</div>
+        </div>
         <el-dropdown>
           <el-avatar class="avatar"
                      src="https://p.sda1.dev/17/9c909ed8057eb3ed63e2561997da29d4/1F68B2F202DD65CE7C3283A262542026.jpg"/>

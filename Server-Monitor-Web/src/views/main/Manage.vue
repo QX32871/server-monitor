@@ -6,10 +6,12 @@ import ClientDetails from "@/component/ClientDetails.vue";
 import RegisterCard from "@/component/RegisterCard.vue";
 import {Plus} from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
+import {useStore} from "@/store";
 
 const list = ref([]);
 
 const route = useRoute();
+const store = useStore();
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -24,7 +26,7 @@ const locations = [
 const checkedNode = ref([]);
 
 const updateList = () => {
-  if (route.name === 'manage'){
+  if (route.name === 'manage') {
     get('/api/monitor/list', data => list.value = data);
   }
 }
@@ -72,7 +74,7 @@ const refreshToken = () => {
         </div>
       </div>
       <div>
-        <el-button :icon="Plus" type="primary" plain
+        <el-button :icon="Plus" type="primary" plain :disabled="!store.isAdmin"
                    @click="register.show=true">添加新主机
         </el-button>
       </div>
