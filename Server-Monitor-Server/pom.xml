@@ -100,6 +100,17 @@
             <artifactId>influxdb-client-java</artifactId>
             <version>6.6.0</version>
         </dependency>
+        <!--Web Socket依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!--SSH 客户端框架-->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
     </dependencies>
 
     <profiles>

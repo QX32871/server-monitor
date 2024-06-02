@@ -4,6 +4,7 @@ import axios from "axios";
 defineProps({
   token: String
 })
+
 </script>
 
 <template>

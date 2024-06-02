@@ -4,14 +4,14 @@ import {get, post} from "@/net";
 import {copyIp, cpuNameToImage, fitByUnit, osNameToIcon, percentageToStatus, rename} from "@/tools";
 import {ElMessage, ElMessageBox} from "element-plus";
 import RuntimeHistory from "@/component/RuntimeHistory.vue";
-import {Delete} from "@element-plus/icons-vue";
+import {Connection, Delete} from "@element-plus/icons-vue";
 
 const props = defineProps({
   id: Number,
   update: Function
 })
 
-const emits = defineEmits(['delete']);
+const emits = defineEmits(['delete', 'terminal']);
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -110,9 +110,14 @@ watch(() => props.id, init, {immediate: true});
             <i class="fa-solid fa-server"></i>
             服务器信息
           </div>
-          <el-button :icon="Delete" type="danger" plain
-                     @click="deleteClient">删除实例主机
-          </el-button>
+          <div>
+            <el-button :icon="Connection" type="primary" plain text
+                       @click="emits('terminal',id)">SSH连接
+            </el-button>
+            <el-button :icon="Delete" type="danger" plain text style="margin-left: 0"
+                       @click="deleteClient">删除实例主机
+            </el-button>
+          </div>
         </div>
 
 

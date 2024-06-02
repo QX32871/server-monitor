@@ -4,16 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qx32871.entity.dto.ClientDTO;
 import com.qx32871.entity.dto.ClientDetailDTO;
-import com.qx32871.entity.vo.request.ClientDetailVO;
-import com.qx32871.entity.vo.request.RenameClientVO;
-import com.qx32871.entity.vo.request.RenameNodeVO;
-import com.qx32871.entity.vo.request.RuntimeDetailVO;
-import com.qx32871.entity.vo.response.ClientDetailsVO;
-import com.qx32871.entity.vo.response.ClientPreviewVO;
-import com.qx32871.entity.vo.response.ClientSimpleVO;
-import com.qx32871.entity.vo.response.RuntimeHistoryVO;
+import com.qx32871.entity.dto.ClientSshDTO;
+import com.qx32871.entity.vo.request.*;
+import com.qx32871.entity.vo.response.*;
 import com.qx32871.mapper.ClientDetailMapper;
 import com.qx32871.mapper.ClientMapper;
+import com.qx32871.mapper.ClientSshMapper;
 import com.qx32871.service.ClientService;
 import com.qx32871.utils.InfluxDBUtils;
 import jakarta.annotation.PostConstruct;
@@ -40,6 +36,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
 
     @Resource
     private ClientDetailMapper clientDetailMapper;
+
+    @Resource
+    private ClientSshMapper clientSshMapper;
 
     @Resource
     private InfluxDBUtils influxDBUtils;
@@ -243,6 +242,35 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, ClientDTO> impl
         clientDetailMapper.deleteById(clientId);
         this.initClientCache();
         currentRuntime.remove(clientId);
+    }
+
+    @Override
+    public void saveSshClientConnection(SshConnectionVO vo) {
+        ClientDTO client = clientIdCache.get(vo.getId());
+        if (client == null) {
+            return;
+        }
+        ClientSshDTO ssh = new ClientSshDTO();
+        BeanUtils.copyProperties(vo, ssh);
+        if (Objects.nonNull(clientSshMapper.selectById(client.getId()))) {
+            clientSshMapper.updateById(ssh);
+        } else {
+            clientSshMapper.insert(ssh);
+        }
+    }
+
+    @Override
+    public SshSettingsVO sshSettings(int clientId) {
+        ClientDetailDTO clientDetail = clientDetailMapper.selectById(clientId);
+        ClientSshDTO ssh = clientSshMapper.selectById(clientId);
+        SshSettingsVO vo;
+        if (ssh == null) {
+            vo = new SshSettingsVO();
+        } else {
+            vo = ssh.asViewObject(SshSettingsVO.class);
+        }
+        vo.setIp(clientDetail.getIp());
+        return vo;
     }
 
     /**

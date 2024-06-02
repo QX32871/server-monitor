@@ -63,7 +63,10 @@ function userLogout() {
         </div>
         <el-dropdown>
           <el-avatar class="avatar"
-                     src="https://p.sda1.dev/17/9c909ed8057eb3ed63e2561997da29d4/1F68B2F202DD65CE7C3283A262542026.jpg"/>
+                     src="https://p.sda1.dev/17/9c909ed8057eb3ed63e2561997da29d4/1F68B2F202DD65CE7C3283A262542026.jpg"
+                     v-if="store.isAdmin"/>
+          <el-avatar class="avatar" :size="30"
+                     src="https://p.sda1.dev/17/0cde298dc8a7239b844d4dc146fe8816/2.jpg" v-else/>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="userLogout">

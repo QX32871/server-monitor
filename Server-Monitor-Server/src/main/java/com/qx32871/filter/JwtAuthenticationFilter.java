@@ -2,7 +2,9 @@ package com.qx32871.filter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.qx32871.entity.RestBean;
+import com.qx32871.entity.dto.AccountDTO;
 import com.qx32871.entity.dto.ClientDTO;
+import com.qx32871.service.AccountService;
 import com.qx32871.service.ClientService;
 import com.qx32871.utils.Const;
 import com.qx32871.utils.JwtUtils;
@@ -29,10 +31,13 @@ import java.util.ArrayList;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Resource
-    JwtUtils utils;
+    private JwtUtils utils;
 
     @Resource
-    ClientService clientService;
+    private ClientService clientService;
+
+    @Resource
+    private AccountService accountService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -61,8 +66,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.setAttribute(Const.ATTR_USER_ID, utils.toId(jwt));
                 request.setAttribute(Const.ATTR_USER_ROLE, new ArrayList<>(user.getAuthorities()).get(0).getAuthority());
+
+                //TODO 以后优化吧
+                if (request.getRequestURI().startsWith("/terminal/") && !accessShell(
+                        (int) request.getAttribute(Const.ATTR_USER_ID),
+                        (String) request.getAttribute(Const.ATTR_USER_ROLE),
+                        Integer.parseInt(request.getRequestURI().substring(10)))) {
+                    response.setStatus(401);
+                    response.setCharacterEncoding("utf-8");
+                    response.getWriter().write(RestBean.failure(401, "无权访问").asJsonString());
+                    return;
+                }
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean accessShell(int userId, String userRole, int clientId) {
+        if (Const.ROLE_ADMIN.equals(userRole.substring(5))) {
+            return true;
+        } else {
+            AccountDTO account = accountService.getById(userId);
+            return account.getClientList().contains(clientId);
+        }
     }
 }

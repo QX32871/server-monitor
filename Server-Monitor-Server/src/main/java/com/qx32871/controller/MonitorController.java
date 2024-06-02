@@ -5,10 +5,8 @@ import com.qx32871.entity.dto.AccountDTO;
 import com.qx32871.entity.vo.request.RenameClientVO;
 import com.qx32871.entity.vo.request.RenameNodeVO;
 import com.qx32871.entity.vo.request.RuntimeDetailVO;
-import com.qx32871.entity.vo.response.ClientDetailsVO;
-import com.qx32871.entity.vo.response.ClientPreviewVO;
-import com.qx32871.entity.vo.response.ClientSimpleVO;
-import com.qx32871.entity.vo.response.RuntimeHistoryVO;
+import com.qx32871.entity.vo.request.SshConnectionVO;
+import com.qx32871.entity.vo.response.*;
 import com.qx32871.service.AccountService;
 import com.qx32871.service.ClientService;
 import com.qx32871.utils.Const;
@@ -128,6 +126,29 @@ public class MonitorController {
             return RestBean.noPermission();
         }
 
+    }
+
+    @PostMapping("/ssh-save")
+    public RestBean<Void> saveSshConnection(@RequestBody @Valid SshConnectionVO vo,
+                                            @RequestAttribute(Const.ATTR_USER_ID) int userId,
+                                            @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
+        if (this.permissionCheck(userId, userRole, vo.getId())) {
+            clientService.saveSshClientConnection(vo);
+            return RestBean.success();
+        } else {
+            return RestBean.noPermission();
+        }
+    }
+
+    @GetMapping("/ssh")
+    public RestBean<SshSettingsVO> sshSettings(int clientId,
+                                               @RequestAttribute(Const.ATTR_USER_ID) int userId,
+                                               @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
+        if (this.permissionCheck(userId, userRole, clientId)) {
+            return RestBean.success(clientService.sshSettings(clientId));
+        } else {
+            return RestBean.noPermission();
+        }
     }
 
     /**
