@@ -5,7 +5,7 @@ springdoc:
     operations-sorter: alpha
 spring:
   influx:
-    url: http://192.168.28.30:8086/
+    url: http://192.168.31.30:8086/
     user: qx32871
     password: 1228479300
   mail:
@@ -13,12 +13,12 @@ spring:
     username: 1228479300@qq.com
     password: jnpjozrmreikgcgb
   rabbitmq:
-    addresses: 192.168.28.30
+    addresses: 192.168.31.30
     username: qx32871
     password: 123456
     virtual-host: /
   datasource:
-    url: jdbc:mysql://192.168.28.30:3306/db_server_monitor
+    url: jdbc:mysql://192.168.31.30:3306/db_server_monitor
     username: root
     password: mysql_HTwEAT
     driver-class-name: com.mysql.cj.jdbc.Driver

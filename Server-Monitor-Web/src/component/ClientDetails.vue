@@ -64,7 +64,7 @@ function deleteClient() {
     get(`/api/monitor/delete?clientId=${props.id}`, () => {
       emits('delete')
       props.update()
-      ElMessage.success('主机已成功移除')
+      ElMessage.success('主机已成功移除，如想重新添加此主机请手动删除主机config目录下的json文件并重启客户端')
     })
   }).catch(() => {
   })
@@ -111,7 +111,8 @@ watch(() => props.id, init, {immediate: true});
             服务器信息
           </div>
           <div>
-            <el-button :icon="Connection" type="primary" plain text
+            <el-button v-if="details.base.osName !== 'Windows'"
+                :icon="Connection" type="primary" plain text
                        @click="emits('terminal',id)">SSH连接
             </el-button>
             <el-button :icon="Delete" type="danger" plain text style="margin-left: 0"

@@ -32,17 +32,17 @@ public interface BaseData {
      * @param <V> 指定VO类型
      */
     default <V> V asViewObject(Class<V> clazz) {
-        try {
-            Field[] fields = clazz.getDeclaredFields();
-            Constructor<V> constructor = clazz.getConstructor();
-            V v = constructor.newInstance();
-            Arrays.asList(fields).forEach(field -> convert(field, v));
-            return v;
-        } catch (ReflectiveOperationException exception) {
-            Logger logger = LoggerFactory.getLogger(BaseData.class);
-            logger.error("在VO与DTO转换时出现了一些错误", exception);
-            throw new RuntimeException(exception.getMessage());
-        }
+            try {
+                Field[] fields = clazz.getDeclaredFields();
+                Constructor<V> constructor = clazz.getConstructor();
+                V v = constructor.newInstance();
+                Arrays.asList(fields).forEach(field -> convert(field, v));
+                return v;
+            } catch (ReflectiveOperationException exception) {
+                Logger logger = LoggerFactory.getLogger(BaseData.class);
+                logger.error("在VO与DTO转换时出现了一些错误", exception);
+                throw new RuntimeException(exception.getMessage());
+            }
     }
 
     /**
