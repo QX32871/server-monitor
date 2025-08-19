@@ -21,10 +21,10 @@ import java.util.List;
 public class MonitorController {
 
     @Resource
-    ClientService clientService;
+    private ClientService clientService;
 
     @Resource
-    AccountService accountService;
+    private AccountService accountService;
 
     @GetMapping("/list")
     public RestBean<List<ClientPreviewVO>> listAllClient(@RequestAttribute(Const.ATTR_USER_ID) int userId,

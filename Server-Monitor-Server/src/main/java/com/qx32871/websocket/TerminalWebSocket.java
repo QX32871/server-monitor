@@ -47,7 +47,7 @@ public class TerminalWebSocket {
 
     private static final Map<Session, Shell> sessionMap = new ConcurrentHashMap<>();
 
-    private final ExecutorService service = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
     @OnOpen
@@ -127,13 +127,15 @@ public class TerminalWebSocket {
         private final InputStream input;
         private final OutputStream output;
 
-        public Shell(Session session, com.jcraft.jsch.Session jschSession, ChannelShell channelShell) throws IOException {
+        public Shell(Session session,
+                     com.jcraft.jsch.Session jschSession,
+                     ChannelShell channelShell) throws IOException {
             this.jschSession = jschSession;
             this.session = session;
             this.channelShell = channelShell;
             this.input = channelShell.getInputStream();
             this.output = channelShell.getOutputStream();
-            service.submit(this::read);
+            executorService.submit(this::read);
         }
 
         private void read() {
@@ -154,7 +156,7 @@ public class TerminalWebSocket {
             output.close();
             channelShell.disconnect();
             jschSession.disconnect();
-            service.shutdown();
+            executorService.shutdown();
         }
     }
 }

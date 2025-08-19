@@ -32,16 +32,16 @@ import java.io.PrintWriter;
 public class SecurityConfiguration {
 
     @Resource
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Resource
-    RequestLogFilter requestLogFilter;
+    private RequestLogFilter requestLogFilter;
 
     @Resource
-    JwtUtils utils;
+    private JwtUtils utils;
 
     @Resource
-    AccountService service;
+    private AccountService service;
 
     /**
      * 针对于 SpringSecurity 6 的新版配置方法

@@ -19,7 +19,7 @@ public class MonitorJobBean extends QuartzJobBean {
     private MonitorUtils monitorUtils;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) {
         RuntimeDetail runtimeDetail = monitorUtils.monitorRuntimeDetail();
         netUtils.updateRuntimeDetails(runtimeDetail);
     }

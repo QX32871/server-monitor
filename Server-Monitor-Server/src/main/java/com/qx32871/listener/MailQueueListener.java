@@ -18,10 +18,10 @@ import java.util.Map;
 public class MailQueueListener {
 
     @Resource
-    JavaMailSender sender;
+    private JavaMailSender sender;
 
     @Value("${spring.mail.username}")
-    String username;
+    private String username;
 
     /**
      * 处理邮件发送
